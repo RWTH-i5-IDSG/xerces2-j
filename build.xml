@@ -1488,7 +1488,7 @@ Authors:
                destdir="${build.dest}"
                source="${javac.source}"
                target="${javac.target}"
-               classpath="${build.dir}/classes:${tools.dir}/${jar.apis}:${tools.dir}/${jar.resolver}:${tools.dir}/${jar.serializer}"
+               classpath="${build.dir}/classes:${tools.dir}/${jar.apis}:${tools.dir}/${jar.resolver}:${tools.dir}/${jar.serializer}:${tools.dir}/${jar.psychopath}"
                debug="${debug}"
                debuglevel="${debuglevel}"
                deprecation="${deprecation}"
