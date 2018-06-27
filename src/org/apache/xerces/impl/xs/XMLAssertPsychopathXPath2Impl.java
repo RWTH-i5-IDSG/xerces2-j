@@ -741,19 +741,20 @@ public class XMLAssertPsychopathXPath2Impl extends XMLAssertAdapter {
                userDefinedMessage = userDefinedMessage + ".";    
            }
            userDefinedMessage = "Assertion failed for schema type '" + typeNameStr + "'. " + userDefinedMessage;          
-           fXmlSchemaValidator.reportSchemaError("cvc-assertion-failure-mesg", new Object[] {userDefinedMessage, mesgSuffix});    
+           //fXmlSchemaValidator.reportSchemaError("cvc-assertion-failure-mesg", new Object[] {userDefinedMessage, mesgSuffix});
+           mesgSuffix = mesgSuffix + userDefinedMessage;
+
+        }
+        if (assertImpl.getAssertKind() == XSConstants.ASSERTION) {
+           // error for xs:assert component
+           fXmlSchemaValidator.reportSchemaError(key, new Object[] {elemNameAnnotation, assertImpl.getTest().getXPathStr(), typeNameStr, mesgSuffix});
         }
         else {
-           if (assertImpl.getAssertKind() == XSConstants.ASSERTION) {
-              // error for xs:assert component
-              fXmlSchemaValidator.reportSchemaError(key, new Object[] {elemNameAnnotation, assertImpl.getTest().getXPathStr(), typeNameStr, mesgSuffix});
-           }
-           else {
-               // errors for xs:assertion facet
-               fXmlSchemaValidator.reportSchemaError("cvc-assertions-valid", new Object[] {value, assertImpl.getTest().getXPathStr(), exceptionMesg});
-               fXmlSchemaValidator.reportSchemaError(key, new Object[] {elemNameAnnotation, assertImpl.getTest().getXPathStr(), typeNameStr, mesgSuffix});  
-           }
+            // errors for xs:assertion facet
+            fXmlSchemaValidator.reportSchemaError("cvc-assertions-valid", new Object[] {value, assertImpl.getTest().getXPathStr(), exceptionMesg});
+            fXmlSchemaValidator.reportSchemaError(key, new Object[] {elemNameAnnotation, assertImpl.getTest().getXPathStr(), typeNameStr, mesgSuffix});
         }
+
         
     } // reportAssertionsError
     
