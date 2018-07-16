@@ -27,7 +27,7 @@ Authors:
    $Id$
 
 ==================================================================== -->
-<project default="usage" basedir=".">
+<project default="usage" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 	
   <!-- Xerces Java directories -->
   <property name="build.dir" value="./build"/>
@@ -137,6 +137,7 @@ Authors:
     <echo message=" sampjar  --> generates the xercesSamples.jar file"/>
     <echo message=" jars --> generates xercesImpl &amp; xercesSamples jars"/>
     <echo message=" jar-schema11 --> 'jar' + XML Schema 1.1 support"/>
+    <echo message=" jar-sources --> Build sources jar"/>
     <echo message=" jars-schema11 --> 'jars' + XML Schema 1.1 support"/>
     <echo message=" xjavac-jar --> generates the xjavac.jar file"/>
     <echo message=" docs     --> generates the HTML documentation"/>
@@ -1534,12 +1535,21 @@ Authors:
       </manifest>
       <metainf dir="." includes="LICENSE,NOTICE"/>
     </jar>
-  </target>	
+  </target>
 
   <!-- =================================================================== -->
-  <!-- Builds xercesImpl, xml-apis and sample jars with Schema 1.1 support -->
+  <!-- Builds java sources as jar                                          -->
   <!-- =================================================================== -->
-  <target name="jars-schema11" depends="jar-schema11, sampjar">
+  <target name="jar-sources">
+    <jar destfile="${build.dir}/schema11-xercesImpl-sources.jar">
+      <fileset dir="${src.dir}" includes="**/*.java"/>
+    </jar>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Builds xercesImpl, xml-apis and java sources with Schema 1.1 support-->
+  <!-- =================================================================== -->
+  <target name="jars-schema11" depends="jar-schema11, sampjar, jar-sources">
     <!-- include the xml-commons APIs -->
     <copy file="${tools.dir}/${jar.apis}" tofile="${build.dir}/${jar.apis}"/>
     <!-- include the xml-commons resolver -->
@@ -1547,6 +1557,7 @@ Authors:
     <!-- include the Xalan Serializer -->
     <copy file="${tools.dir}/${jar.serializer}" tofile="${build.dir}/${jar.serializer}"/>
   </target>
+
 
   <!-- =================================================================== -->
   <!-- Builds the xjavac jar file                                          -->
@@ -1580,4 +1591,31 @@ Authors:
       <metainf dir="." includes="LICENSE,NOTICE"/>
     </jar>
   </target>
+
+  <target name ="maven_deploy">
+    <artifact:pom id="pom_xerces" file="pom_xerces.xml"/>
+    <artifact:pom id="pom_xpath2" file="pom_xpath2.xml"/>
+    <artifact:deploy file="${build.dir}/schema11-xercesImpl.jar">
+      <remoteRepository url="https://treibhaus.informatik.rwth-aachen.de/nexus/repository/maven-releases/" id="NexusTreibhaus"/>
+      <attach file="${build.dir}/schema11-xercesImpl-sources.jar" type="jar" classifier="sources"/>
+      <pom refid="pom_xerces"/>
+    </artifact:deploy>
+    <artifact:deploy file="${tools.dir}/org.eclipse.wst.xml.xpath2.processor_1.2.0.jar">
+      <remoteRepository url="https://treibhaus.informatik.rwth-aachen.de/nexus/repository/maven-releases" id="NexusTreibhaus"/>
+      <pom refid="pom_xpath2"/>
+    </artifact:deploy>
+  </target>
+
+  <target name ="maven_install">
+    <artifact:pom id="pom_xerces" file="pom_xerces.xml"/>
+    <artifact:pom id="pom_xpath2" file="pom_xpath2.xml"/>
+    <artifact:install file="${tools.dir}/org.eclipse.wst.xml.xpath2.processor_1.2.0.jar">
+      <pom refid="pom_xpath2"/>
+    </artifact:install>
+    <artifact:install file="${build.dir}/schema11-xercesImpl.jar">
+      <attach file="${build.dir}/schema11-xercesImpl-sources.jar" type="jar" classifier="sources"/>
+      <pom refid="pom_xerces"/>
+    </artifact:install>
+  </target>
+
 </project>
